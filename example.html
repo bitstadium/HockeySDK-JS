@@ -7,6 +7,13 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<script src="hockeyapp.js"></script>
 		<script type="text/javascript">
+			HockeyApp.init({
+				appID: "123",
+				bundleIdentifier: "custom",
+		    url: 'http://localhost:3000/api/2/apps/',
+		    version: '1.0'
+			});
+
 			function raiseException() {
 				try {
 					throw new Error("Oops... something went wrong");
@@ -16,13 +23,23 @@
 				}
 			}
 
-			function catchException(errorMsg, url, lineNumber) {
+			function errorHandler(message, url, lineNumber) {
+				HockeyApp.reportMessage(message, "window.onerror", url, lineNumber);
 			}
+			window.onerror = errorHandler;
 
-			//window.onerror = catchException;
+			function customError() {
+				message = "Some error message";
+				description = "Addition information, e.g. server response"
+				HockeyApp.sendError(message + "\n" + HockeyApp.generateTrace(), description);
+			}
 		</script>
 	</head>
 	<body>
-		<a href="#" onClick="javaScript:raiseException()">Raise exception</a>
+		<h1>Some Example Errors</h1>
+		<ul>
+			<li><a href="#" onClick="javaScript:raiseException()">Raise exception</a></li>
+			<li><a href="#" onClick="javaScript:unkownFunction()">Unknown function</a></li>
+			<li><a href="#" onClick="javaScript:customError()">Custom error</a></li>
 	</body>
 </html>

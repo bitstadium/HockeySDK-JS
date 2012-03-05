@@ -1,25 +1,34 @@
 HockeyApp = {
-  sendError:function(error) {
-    var that    = this;
+  defaults: {
+    appID: 'APP_ID',
+    bundleIdentifier: 'BUNDLE_IDENTIFIER',
+    url: 'https://rink.hockeyapp.net/api/2/apps/',
+    version: 'VERSION'
+  },
 
-    this.defaults = {
-      appID: '7f6caf2cb70353e883c869f8299088b2',
-      bundleIdentifier: 'custom',
-      //url: 'https://rink.hockeyapp.net/api/2/apps/',
-      url: 'http://hockeyapp.local:8080/api/2/apps/',
-      version: '1.0'
-    };
+  settings: {},
 
+  init:function(options) {
+    HockeyApp.settings = $.extend({}, HockeyApp.defaults, options);
+  },
+
+  sendError:function(error, description) {
     this.data = [];
-    this.data.push("Package: " + this.defaults.bundleIdentifier);
-    this.data.push("Version: " + this.defaults.version);
+    this.data.push("Package: " + this.settings.bundleIdentifier);
+    this.data.push("Version: " + this.settings.version);
+    this.data.push("Language: " + window.navigator.language);
     this.data.push("Platform: " + window.navigator.platform);
     this.data.push("User-Agent: " + window.navigator.userAgent);
     this.data.push("");
     this.data.push(error);
 
-    if ((this.data) && (this.defaults.url) && (this.defaults.appID)) {
-      var url = this.defaults.url + this.defaults.appID + "/crashes/js" + '?raw=' + escape(this.data.join("\n"));
+    if ((this.data) && (this.settings.url) && (this.settings.appID)) {
+      var url = this.settings.url + this.settings.appID + "/crashes/js";
+      url += '?raw=' + escape(this.data.join("\n"));
+      if (description != null) {
+        url += '&description=' + escape(description);
+      }
+
       if ($('#hockeyapp-iframe')[0]) {
         $('#hockeyapp-iframe').attr('src', url);
       } 
@@ -27,9 +36,35 @@ HockeyApp = {
         $('body').append('<iframe id="hockeyapp-iframe" src="' + url + '" width="1" height="1">');
       }
     }
-  }
+  },
+
+  reportMessage:function(message, method, url, lineNumber) {
+    if (url != null) {
+      this.sendError(message + "\n  at " + method + " (" + url + ":" + lineNumber + ")");
+    }
+    else {
+      this.sendError(message);
+    }
+  },
 
   reportException:function(exception) {
-    sendError(exception.stack);
+    this.sendError(exception.stack);
+  },
+
+  generateTrace:function() {
+    try {
+      throw new Error();
+    } 
+    catch (e) {
+      if (e.stack) {
+        lines = e.stack.split("\n");
+        if (lines.length > 2) {
+          lines.shift();
+          lines.shift();
+          return lines.join("\n");
+        }
+      } 
+    }
+    return '  at unknown';
   }
 };
