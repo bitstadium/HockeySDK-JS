@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset=utf-8>
+		<title>HockeySDK-JS: Demo</title>
+		<link rel="stylesheet" href="hockeyapp.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+		<script src="hockeyapp.js"></script>
+		<script type="text/javascript">
+			function raiseException() {
+				try {
+					throw new Error("Oops... something went wrong");
+				}
+				catch (e) {
+					HockeyApp.reportException(e);
+				}
+			}
+
+			function catchException(errorMsg, url, lineNumber) {
+			}
+
+			//window.onerror = catchException;
+		</script>
+	</head>
+	<body>
+		<a href="#" onClick="javaScript:raiseException()">Raise exception</a>
+	</body>
+</html>
