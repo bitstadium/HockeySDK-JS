@@ -1,4 +1,9 @@
-HockeyApp = {
+
+(function(context){
+
+"use strict";
+
+context.HockeyApp = {
   defaults: {
     appID: 'APP_ID',
     bundleIdentifier: 'BUNDLE_IDENTIFIER',
@@ -24,9 +29,9 @@ HockeyApp = {
 
     if ((this.data) && (this.settings.url) && (this.settings.appID)) {
       var url = this.settings.url + this.settings.appID + "/crashes/js";
-      url += '?raw=' + escape(this.data.join("\n"));
+      url += '?raw=' + encodeURIComponent(this.data.join("\n"));
       if (description != null) {
-        url += '&description=' + escape(description);
+        url += '&description=' + encodeURIComponent(description);
       }
 
       if ($('#hockeyapp-iframe')[0]) {
@@ -57,7 +62,7 @@ HockeyApp = {
     } 
     catch (e) {
       if (e.stack) {
-        lines = e.stack.split("\n");
+        var lines = e.stack.split("\n");
         if (lines.length > 2) {
           lines.shift();
           lines.shift();
@@ -68,3 +73,6 @@ HockeyApp = {
     return '  at unknown';
   }
 };
+
+})(window);
+
